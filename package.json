@@ -1,0 +1,22 @@
+{
+  "name": "stock-strategies",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bumler/stock-strategies.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bumler/stock-strategies/issues"
+  },
+  "homepage": "https://github.com/Bumler/stock-strategies#readme",
+  "dependencies": {
+    "lodash": "^4.17.20"
+  }
+}
