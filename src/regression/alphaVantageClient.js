@@ -6,7 +6,7 @@ const API_KEY = "FS1PD12N58WMCZF4";
 const FUNCTION = "TIME_SERIES_INTRADAY_EXTENDED";
 
 const source = "alphaVantage";
-const instance = null;
+let instance = null;
 
 async function retrieveDataForDate(symbol, date){
     const slice = getSlice(date);
@@ -18,20 +18,21 @@ async function retrieveDataForDate(symbol, date){
     };
 
     console.log(`Querying AlphaVantage for ${symbol} at slice ${slice}`)
-    return await axios.get("https://www.alphavantage.co/query", { params })
+    return await getClient().get("/query", { params })
         .then( function (response) {
-            return response;
-        }).reject( function (err) {
+            console.log("DATA RETRIEVED");
+            return response.data;
+        }).catch( function (err) {
             console.log(err)
+            throw err;
         });
 }
 
 function getClient(){
     if (!instance){
         instance = axios.create({
-            baseURL: 'https://some-domain.com/api/',
-            timeout: 1000,
-            headers: {'X-Custom-Header': 'foobar'}
+            baseURL: 'https://www.alphavantage.co',
+            timeout: 180000,
           });
     }
 

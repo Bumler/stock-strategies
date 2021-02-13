@@ -6,6 +6,7 @@ const { parseMarketData } = require('./marketParsingFactory.js');
 
 const MARKET_DATA_DIRECTORY_PATH = './resources/marketDataFileDirectory.json';
 
+//todo validation on date should be < 24 months and not after today.
 async function getMarketDataFile(symbol, date){
     console.log("starting");
     const marketDataFileDirectory = JSON.parse(fs.readFileSync(MARKET_DATA_DIRECTORY_PATH));
@@ -19,11 +20,7 @@ async function getMarketDataFile(symbol, date){
         return parseMarketData(rawData);
     }
     
-    console.log(`Retrieving data for ${symbol}`)
     const retrievedData = await client.retrieveDataForDate(symbol, date);
-
-    console.log("DATA RETRIEVED");
-    console.log(retrievedData);
 
     const fileName = writeMarketDataToFile(symbol, date, retrievedData);
     const parsedData = parseMarketData(retrievedData, client.source);
@@ -42,19 +39,27 @@ function getMarketDataForSymbol(marketDataFileDirectory, symbol){
 }
 
 function writeMarketDataToFile(symbol, date, retrievedData) {
-    const fileName = `${symbol}/GENERATED${symbol}-${date.replace(/:/g, "-")}.csv`;
-    
+    const fileName = `${symbol}/${symbol}-${date.replace(/:/g, "-")}.csv`;
+
+    ensureDirectoryExistence(createPath(symbol));
+
     console.log(`Writing market data to ${fileName}`);
     //this may cause an issue if we query for the same date while querying a symbol
     fs.writeFile(createPath(fileName), retrievedData, err => writeCallback(err));
     return fileName;
 }
 
+function ensureDirectoryExistence(dirPath) {
+    if (fs.existsSync(dirPath)) {
+      return true;
+    }
+
+    console.log(`Creating directory ${dirPath}`);
+    fs.mkdirSync(dirPath);
+  }
+
 function updateDataFileDirectory(marketDataFileDirectory, symbol, fileName, parsedData){
     let marketDataForSymbol = getMarketDataForSymbol(marketDataFileDirectory, symbol);
-    
-    console.log("heloo");
-    console.log(parsedData);
 
     const newFileInfo = {
         endDate: _.head(parsedData).time,
@@ -62,6 +67,7 @@ function updateDataFileDirectory(marketDataFileDirectory, symbol, fileName, pars
         source: client.source,
         fileName,
     };
+    console.log(`Adding new market data to directory\n${JSON.stringify(newFileInfo)}`);
 
     if (_.isEmpty(marketDataForSymbol)){
         marketDataFileDirectory.marketDataLocations[symbol.toUpperCase()] = [newFileInfo];
@@ -75,35 +81,8 @@ function updateDataFileDirectory(marketDataFileDirectory, symbol, fileName, pars
 }
 
 function writeCallback(err){
-    console.log("test");
-    console.error(err);
+    if( err )
+        console.error(err);
 }
-//todo these should be unit tests :P
-// //where yesterday is Moment<2021-02-09T20:00:00-08:00>
-// console.log("month 1");
-// getMarketDataFile("GME", "2021-02-09 20:00:00");
-// getMarketDataFile("GME", "2021-01-11 04:08:00");
-
-// console.log("month 2");
-// getMarketDataFile("GME", "2020-12-14 04:04:00");
-// getMarketDataFile("GME", "2021-01-08 20:00:00");
-
-// console.log("month 3");
-// getMarketDataFile("GME", "2020-11-12 04:12:00");
-// getMarketDataFile("GME", "2020-12-11 19:57:00");
-
-// console.log("month 4");
-// getMarketDataFile("GME", "2020-11-11 20:00:00");
-// getMarketDataFile("GME", "2020-10-13 06:36:00");
-
-// console.log("month 24");
-// getMarketDataFile("GME", "2019-03-22 17:23:00");
-// getMarketDataFile("GME", "2019-02-21 07:51:00");
-
-(async () => {
-    var text = await getMarketDataFile("GME", "2021-02-05 20:00:00");
-})().catch(e => {
-    // Deal with the fact the chain failed
-});
 
 module.exports = { getMarketDataFile };
