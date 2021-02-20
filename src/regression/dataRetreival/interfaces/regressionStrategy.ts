@@ -1,4 +1,4 @@
-interface SaleStrategy {
+interface RegressionStrategy {
     relativeTo: RelativeTo;
     action: TradeAction;
     shares: number;
@@ -17,4 +17,4 @@ enum TradeQuantityType {
     SHARE, PERCENT
 }
 
-export { SaleStrategy, RelativeTo, TradeAction, TradeQuantityType };
+export { RegressionStrategy, RelativeTo, TradeAction, TradeQuantityType };
