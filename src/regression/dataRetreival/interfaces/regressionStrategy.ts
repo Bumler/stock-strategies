@@ -1,20 +1,24 @@
 interface RegressionStrategy {
-    relativeTo: RelativeTo;
-    action: TradeAction;
-    shares: number;
-    quantityType: TradeQuantityType;
+    conditions: ConditionalTrade[];
 }
 
-enum RelativeTo {
-    START, RELATIVE_HIGH, RELATIVE_LOW
+interface ConditionalTrade {
+    order: Order;
+    action: TradeAction;
+    sharesToTrade: number;
+}
+
+interface Order {
+    amount: number;
+    tradeCondition: ClassicOrder;
+}
+
+enum ClassicOrder {
+    TRAILING_STOP
 }
 
 enum TradeAction {
     BUY, SELL
 }
 
-enum TradeQuantityType {
-    SHARE, PERCENT
-}
-
-export { RegressionStrategy, RelativeTo, TradeAction, TradeQuantityType };
+export { RegressionStrategy, ConditionalTrade, TradeAction, ClassicOrder };

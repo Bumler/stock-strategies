@@ -1,25 +1,41 @@
+import _ from "lodash";
 import { Moment } from "moment";
 import ParsedMarketData from "./dataRetreival/interfaces/parsedMarketData";
-import { RegressionOutcome } from "./dataRetreival/interfaces/regressionOutcome";
+import { Position } from "./dataRetreival/interfaces/position";
 import { RegressionStrategy } from "./dataRetreival/interfaces/regressionStrategy";
 
 class RegressionRunner {
-    regressionOutcomes: RegressionOutcome[]
+    public regressionOutcomes: RegressionOutcome[]
     startDate: Moment;
 
-    constructor(regressionOutcomes: RegressionOutcome[], startDate: Moment) {
-        this.regressionOutcomes = regressionOutcomes;
-        this.startDate = startDate;
+    constructor(regressionInput: RegressionInput) {
+        
+        this.regressionOutcomes = this.initOutcomes(regressionInput.strategies);
+        this.startDate = regressionInput.startDate;
     }
 
-    public run = () => {
+    private initOutcomes = (strategies: RegressionStrategy[]): RegressionOutcome[] => 
+        _.map(strategies, it => {return {strategy: it, position: new Position()}});
+
+    public step = () => {
         //Gets next line of market data
         //Iterates through all regression outcomes calling step 
         //until no shares remain in any outcome
     }
 
     getNextDataChunk = () => {}
-    applyStrategy = (regressionOutcome: RegressionOutcome, marketData: ParsedMarketData) => {}
+    applyStrategy = (regressionOutcome: Position, marketData: ParsedMarketData) => {}
+}
+
+interface RegressionInput{
+    strategies: RegressionStrategy[],
+    startDate: Moment,
+    initialCapital: number
+}
+
+interface RegressionOutcome{
+    position: Position;
+    strategy: RegressionStrategy;
 }
 
 export default RegressionRunner;
