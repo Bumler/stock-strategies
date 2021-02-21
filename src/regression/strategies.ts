@@ -4,15 +4,16 @@
     deal with parsing and persisting.
 */
 
-import { RegressionStrategy, TradeAction, ClassicOrder } from "./dataRetreival/interfaces/regressionStrategy"
+import { RegressionStrategy, TradeAction, ClassicOrderType, SupportedOrderType } from "./dataRetreival/interfaces/regressionStrategy"
 
 class Strategies{
     public strategies: RegressionStrategy[] = [{
         conditions: [
             {
                 order : {
-                    amount : 25,
-                    tradeCondition : ClassicOrder.TRAILING_STOP
+                    type: SupportedOrderType.CLASSIC_ORDER,
+                    tradeCondition : ClassicOrderType.TRAILING_STOP,
+                    amount : .25
                 },
                 action : TradeAction.SELL,
                 sharesToTrade : 100

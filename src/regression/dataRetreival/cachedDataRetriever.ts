@@ -8,25 +8,23 @@ class CachedDataRetriever {
     cachedMarketData: ParsedMarketData[] | undefined;
     nextIndex: number | undefined;
     symbol: string;
-    currentDateString: string;
+    currentDate: Moment;
     marketDataRetreiver: MarketDataRetreiver;
 
-    constructor(symbol: string, startDateString: string, marketDataRetreiver: MarketDataRetreiver){
+    constructor(symbol: string, startDateString: Moment, marketDataRetreiver: MarketDataRetreiver){
         this.symbol = symbol;
-        this.currentDateString = startDateString;
+        this.currentDate = startDateString;
         this.marketDataRetreiver = marketDataRetreiver;
      }
 
-    public getNextMarketData = async (dateString: string): Promise<ParsedMarketData> => {
+    public getNextMarketData = async (): Promise<ParsedMarketData | null> => {
         if(this.nextIndex && this.cachedMarketData && this.nextIndex < this.cachedMarketData.length){
             const data = this.cachedMarketData[this.nextIndex];
             this.nextIndex++;
-            this.currentDateString = data.time;
+            this.currentDate = moment(data.time);
             return data;
         }
         else{
-            const asDate = moment(dateString);
-
             const queryDateForNextChunk = this.getQueryDate();
             this.cachedMarketData = await this.marketDataRetreiver.getMarketDataFile(this.symbol, queryDateForNextChunk);
             
@@ -34,11 +32,13 @@ class CachedDataRetriever {
             const last = _.last(this.cachedMarketData);
 
             if (!head || !last){
-                throw new Error(`No data found for ${this.symbol} at ${dateString}`); 
+                return null; 
             }
 
-            if (asDate.isBefore(moment(head.time))){
+            const firstDate = moment(head.time);
+            if (this.currentDate.isBefore(moment(head.time))){
                 this.nextIndex = 1;
+                this.currentDate = firstDate;
                 return head;
             } 
             
@@ -49,8 +49,8 @@ class CachedDataRetriever {
                 const current = this.cachedMarketData[currentIndex];
                 const next = this.cachedMarketData[this.nextIndex];
 
-                if(this.isBetweenStartInclusive(asDate, current, next)){
-                    this.currentDateString = current.time;
+                if(this.isBetweenStartInclusive(this.currentDate, current, next)){
+                    this.currentDate = moment(current.time);
                     return current;
                 }
 
@@ -58,6 +58,8 @@ class CachedDataRetriever {
                 this.nextIndex++;
             }
             
+            const lastDate = moment(head.time);
+            this.currentDate = lastDate;
             return last;
         }
     }
@@ -70,8 +72,8 @@ class CachedDataRetriever {
     //If we are getting the next chunk of data need to increment by one business day.
     private getQueryDate = (): Moment =>
         !this.cachedMarketData 
-            ? moment(this.currentDateString) 
-            : moment(this.currentDateString).businessAdd(1);
+            ? this.currentDate 
+            : this.currentDate.businessAdd(1);
 }
 
 export default CachedDataRetriever;
