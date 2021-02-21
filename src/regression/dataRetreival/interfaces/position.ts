@@ -1,22 +1,34 @@
 import _ from "lodash";
+import moment from "moment";
 import { Moment } from "moment";
+import ParsedMarketData from "./parsedMarketData";
 import { TradeAction } from "./regressionStrategy";
 
 class Position {
-    sharesRemaining: number;
     orderHistory: Order[];
 
     currentSharePrice: number;
     relativeHigh: number;
     relativeLow: number;
+    lastUpdated: Moment;
     
     constructor(){
-        this.sharesRemaining = 0;
         this.currentSharePrice = 0;
         this.relativeHigh = 0;
-        this.relativeLow = 0;
+        this.relativeLow = Number.MAX_SAFE_INTEGER;
+        this.lastUpdated = moment();
 
         this.orderHistory = [];
+    }
+
+    public update(marketData: ParsedMarketData){
+        //we could potentially split up the share price to be a function
+        //that returns close, current, high but I don't see use case 
+        //for that yet and won't be hard to refactor.
+        this.currentSharePrice = marketData.close; 
+        this.relativeHigh = Math.max(marketData.high, this.relativeHigh);
+        this.relativeLow = Math.max(marketData.low, this.relativeLow);
+        this.lastUpdated = moment(marketData.time);
     }
 
     /*

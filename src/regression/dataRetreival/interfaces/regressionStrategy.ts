@@ -1,3 +1,6 @@
+import { Moment } from "moment";
+import { Order } from "./position";
+
 interface RegressionStrategy {
     conditions: ConditionalTrade[];
 }
@@ -16,9 +19,14 @@ interface ConditionalTrade {
     sharesToTrade: number;
 }
 
+/*
+    There are a few ways to implement a generic supported order
+    I chose to go with an interface. The others prop is explained 
+    here https://stackoverflow.com/questions/31816061/why-am-i-getting-an-error-object-literal-may-only-specify-known-properties
+*/
 interface SupportedOrder {
     type: SupportedOrderType;
-    [others: string]: any;
+    [others: string]: any; 
 }
 
 interface ClassicOrder {
