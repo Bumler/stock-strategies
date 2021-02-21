@@ -6,7 +6,7 @@
 
 import { RegressionStrategy, TradeAction, ClassicOrderType, SupportedOrderType } from "./dataRetreival/interfaces/regressionStrategy"
 
-class Strategies{
+export class Strategies{
     public strategies: RegressionStrategy[] = [{
         conditions: [
             {
@@ -16,10 +16,8 @@ class Strategies{
                     amount : .25
                 },
                 action : TradeAction.SELL,
-                sharesToTrade : 100
+                sharesToTrade : 1
             }
         ]
     }];
 }
-
-export default Strategies
