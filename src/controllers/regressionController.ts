@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import moment from 'moment';
 import AlphaVantageClient from '../regression/dataRetreival/alphaVantage/alphaVantageClient';
 import MarketDataRetreiver from '../regression/dataRetreival/marketDataRetriever';
 
@@ -19,7 +20,7 @@ class RegressionController {
     runRegression = async (req: Request, res: Response) => {
         //will ultimately pass in a strategy
         console.log("Running Regression");
-        res.send(await this.marketDataRetriever.getMarketData("GME", "2019-12-05 20:00:00"));
+        res.send(await this.marketDataRetriever.getMarketDataFile("GME", moment("2019-12-05 20:00:00")));
     };
   }
    

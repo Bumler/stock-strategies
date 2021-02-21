@@ -1,6 +1,6 @@
 import fs from 'fs';
 import _ from 'lodash';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import DataClient from './interfaces/dataClient';
 import { MarketDataFile }  from './interfaces/marketDataDirectory';
 import parseMarketData from './marketParsingFactory';
@@ -15,7 +15,7 @@ class MarketDataRetreiver {
     }
 
     //todo validation on date should be < 24 months and not after today.
-    public getMarketData = async (symbol: string, date: string): Promise<ParsedMarketData[]> => {
+    public getMarketDataFile = async (symbol: string, date: Moment): Promise<ParsedMarketData[]> => {
         console.log("starting");
         const marketDataDirectory = this.getMarketDataDirectory();
 
@@ -37,7 +37,7 @@ class MarketDataRetreiver {
         return parsedData;
     }
     
-    getMarketDataDirectory = (): Map<string, MarketDataFile[]> => {
+    private getMarketDataDirectory = (): Map<string, MarketDataFile[]> => {
         try {
             const marketDataLocations: Map<string, MarketDataFile[]> 
                 = new Map (JSON.parse(fs.readFileSync(this.MARKET_DATA_DIRECTORY_PATH, 'utf-8')));            
@@ -50,12 +50,12 @@ class MarketDataRetreiver {
         }
     }
 
-    createPath = (fileName: string): string => {
+    private createPath = (fileName: string): string => {
         return `./resources/${fileName}`;
     }
     
-    writeMarketDataToFile(symbol: string, date: string, retrievedData: string) {
-        const fileName = `${symbol}/${symbol}-${date.replace(/:/g, "-")}.csv`;
+    private writeMarketDataToFile(symbol: string, date: Moment, retrievedData: string) {
+        const fileName = `${symbol}/${symbol}-${date.format("MM-dd-yyyy")}.csv`;//todo pretty print date with no : should be doable with a formatter.
     
         this.ensureDirectoryExistence(this.createPath(symbol));
     
@@ -65,7 +65,7 @@ class MarketDataRetreiver {
         return fileName;
     }
     
-    ensureDirectoryExistence(dirPath: string) {
+    private ensureDirectoryExistence(dirPath: string) {
         if (fs.existsSync(dirPath)) {
           return true;
         }
@@ -74,7 +74,7 @@ class MarketDataRetreiver {
         fs.mkdirSync(dirPath);
       }
     
-    updateDataFileDirectory(marketDataDirectory: Map<String, MarketDataFile[]>, symbol: string, fileName: string, parsedData: ParsedMarketData[]){
+    private updateDataFileDirectory(marketDataDirectory: Map<String, MarketDataFile[]>, symbol: string, fileName: string, parsedData: ParsedMarketData[]){
         let marketDataForSymbol = marketDataDirectory.get(symbol.toUpperCase());
     
         const endDate = _.head(parsedData)?.time;
@@ -106,7 +106,7 @@ class MarketDataRetreiver {
         fs.writeFile(this.MARKET_DATA_DIRECTORY_PATH, asJson, err => this.writeCallback(err));
     }
     
-    writeCallback = (err: NodeJS.ErrnoException | null) => {
+    private writeCallback = (err: NodeJS.ErrnoException | null) => {
         if( err )
             console.error(err);
     }
