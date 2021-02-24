@@ -4,9 +4,10 @@ import MarketDataSource from "../marketDataSource";
 import { default as axios } from 'axios';
 import moment, { Moment } from 'moment';
 import DataClient from "../interfaces/dataClient";
+import { ALPHA_VANTAGE_API_KEY } from "../../../config/config";
 
 const INTERVAL = "1min";
-const API_KEY = "FS1PD12N58WMCZF4";
+const API_KEY = ALPHA_VANTAGE_API_KEY;
 const FUNCTION = "TIME_SERIES_INTRADAY_EXTENDED";
 
 class AlphaVantageClient implements DataClient{

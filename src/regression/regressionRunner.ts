@@ -4,10 +4,16 @@ import CachedDataRetriever from "./dataRetreival/cachedDataRetriever";
 import ParsedMarketData from "./dataRetreival/interfaces/parsedMarketData";
 import { Position } from "./dataRetreival/interfaces/position";
 import { RegressionStrategy } from "./dataRetreival/interfaces/regressionStrategy";
-import MarketDataRetreiver from "./dataRetreival/marketDataRetriever";
+import { MarketDataRetreiver } from "./dataRetreival/marketDataRetriever";
 import { selectStrategy } from "./tradeExecution/conditionalTradeSelector";
 import { executeInitialPurchase, executeTrade } from "./tradeExecution/regressionTradeExecutor";
 
+//Not married to this name.
+//I think we should rework the relationship between this and the cache
+//We should be able to peel away any statefulness from the runner by having it 
+//pass back a cacheIndex and the position. It will also take in a cache and position
+//The cache will build a map of slices and grab the data with the index.
+//Initial purchase should also be rolled into step
 export class RegressionRunner {
     public regressionOutcomes: RegressionOutcome[];
     public cachedMarketData: CachedDataRetriever;
@@ -22,6 +28,7 @@ export class RegressionRunner {
     private initOutcomes = (strategies: RegressionStrategy[]): RegressionOutcome[] => 
         _.map(strategies, it => {return {strategy: it, position: new Position()}});
 
+    //could potentially coallesce this with step and have an option to force purchase.
     public initialPurchase = async (initialCapital: number) => {
         const marketData = await this.cachedMarketData.getNextMarketData();
 

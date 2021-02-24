@@ -6,7 +6,7 @@ import { MarketDataFile }  from './interfaces/marketDataDirectory';
 import parseMarketData from './marketParsingFactory';
 import ParsedMarketData from './interfaces/parsedMarketData';
 
-class MarketDataRetreiver {
+export class MarketDataRetreiver {
     MARKET_DATA_DIRECTORY_PATH = './resources/marketDataFileDirectory.json';
     client: DataClient;
 
@@ -14,8 +14,9 @@ class MarketDataRetreiver {
         this.client = client;
     }
 
-    //todo validation on date should be < 24 months and not after today.
     public getMarketDataFile = async (symbol: string, date: Moment): Promise<ParsedMarketData[]> => {
+        validateDate(date);
+        
         console.log("starting");
         const marketDataDirectory = this.getMarketDataDirectory();
 
@@ -55,7 +56,7 @@ class MarketDataRetreiver {
     }
     
     private writeMarketDataToFile(symbol: string, date: Moment, retrievedData: string) {
-        const fileName = `${symbol}/${symbol}-${date.format("MM-dd-yyyy")}.csv`;//todo pretty print date with no : should be doable with a formatter.
+        const fileName = `${symbol}/${symbol}-${date.format("MM-dd-yyyy")}.csv`;
     
         this.ensureDirectoryExistence(this.createPath(symbol));
     
@@ -112,4 +113,8 @@ class MarketDataRetreiver {
     }
 }
 
-export default MarketDataRetreiver;
+function validateDate(date: Moment){
+    if(date.isAfter(moment(), "d") || date.isSame(moment(), "d")){
+        throw new Error("Stock history cannot be retrieved later than yesterday");
+    }
+}

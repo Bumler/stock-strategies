@@ -1,5 +1,5 @@
 import moment from "moment";
-import { InitialPurchaseOrder } from "./tradeExecution/initialPurchaseOrder";
+import { InitialPurchaseOrder } from "./initialPurchaseOrder";
 
 export class InitialPurchases {
     initialPurchases: Map<string, InitialPurchaseOrder>;

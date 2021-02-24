@@ -1,7 +1,7 @@
 import moment from "moment-business-days";
 import { Moment } from "moment";
 import ParsedMarketData from "./interfaces/parsedMarketData";
-import MarketDataRetreiver from "./marketDataRetriever";
+import { MarketDataRetreiver } from "./marketDataRetriever";
 import _ from "lodash";
 
 class CachedDataRetriever {

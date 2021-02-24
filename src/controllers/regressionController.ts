@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import moment from 'moment';
 import AlphaVantageClient from '../regression/dataRetreival/alphaVantage/alphaVantageClient';
-import MarketDataRetreiver from '../regression/dataRetreival/marketDataRetriever';
+import { MarketDataRetreiver } from '../regression/dataRetreival/marketDataRetriever';
 
 class RegressionController {
     public path = '/regression';
